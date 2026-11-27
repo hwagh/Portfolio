@@ -78,8 +78,6 @@ h3{margin:0;font-size:19px;line-height:1.3;font-weight:600}
 .mini em{font-style:normal;font-weight:600;font-size:14px}
 .sub{margin:44px 0 0;font-family:var(--serif);font-size:22px;font-weight:600}
 /* approach */
-.steps{display:flex;flex-wrap:wrap;border-top:2px solid var(--ink)}
-.step{flex:1 1 200px;min-width:0;padding:22px 20px 22px 0}
 .step svg{display:block;margin-bottom:10px}
 .step .n{font-family:var(--serif);font-size:15px;color:var(--accent);font-weight:600}
 .step h3{font-size:18px;margin:2px 0 6px}
@@ -158,6 +156,27 @@ a:focus-visible,summary:focus-visible{outline:3px solid #7fb0ff;outline-offset:2
 .rv.done{transition-delay:0s}
 @media print{.rv{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}.card:hover,.mini:hover,.case:hover,.btn:hover{transform:none}}
+/* approach as a sequential process */
+.steps{position:relative;padding:0 0 0 44px}
+.step{position:relative;min-width:0;padding:0 0 28px}
+.track{position:absolute;left:11px;top:12px;width:3px;height:var(--len,0px);background:var(--line)}
+.fill{display:block;width:100%;height:100%;background:var(--accent);transition:height .9s ease,width .9s ease}
+.step .dot{position:absolute;left:-44px;top:0;width:25px;height:25px;border-radius:50%;box-sizing:border-box;background:var(--accent);border:3px solid var(--accent);box-shadow:0 0 0 6px var(--accent-soft);transition:background .3s ease .5s,border-color .3s ease .5s,box-shadow .4s ease .5s}
+.steps.seq .fill{height:var(--fill,0px)}
+.steps.seq .step{opacity:.3;transform:translateY(10px);transition:opacity .6s ease .45s,transform .6s ease .45s}
+.steps.seq .step.on{opacity:1;transform:none}
+.steps.seq .step .dot{background:#fff;border-color:var(--line);box-shadow:none}
+.steps.seq .step.on .dot{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 6px var(--accent-soft)}
+@media (min-width:900px){
+ .steps{display:grid;grid-template-columns:repeat(var(--n),1fr);padding:44px 0 0}
+ .step{padding:0 20px 8px 0}
+ .track{left:12px;top:11px;height:3px;width:var(--len,0px)}
+ .fill{height:100%;width:100%}
+ .steps.seq .fill{height:100%;width:var(--fill,0px)}
+ .step .dot{left:0;top:-44px}
+}
+@media print{.steps.seq .step{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.fill,.step,.dot{transition:none!important}}
 </style>
 </head>
 <body>
@@ -249,8 +268,8 @@ parts.push(section("reports", "Reports and dashboards", "Reports leaders use to 
 const A = SITE.approach;
 parts.push(section("approach", "End-to-end approach", "I don't just solve the problem. I make it stick.",
   "The same path every time, from the physical work to a control that holds across sites.",
-  `<div class="steps">${A.steps.map((s, i) => `
-    <div class="step">${icon(s.icon)}<div class="n">0${i + 1}</div><h3>${esc(s.title)}</h3>${s.sub ? `<div class="subl">${esc(s.sub)}</div>` : ""}<p>${esc(s.text)}</p></div>`).join("")}</div>
+  `<div class="steps" style="--n:${A.steps.length}"><div class="track"><i class="fill"></i></div>${A.steps.map((s, i) => `
+    <div class="step"><span class="dot"></span>${icon(s.icon)}<div class="n">0${i + 1}</div><h3>${esc(s.title)}</h3>${s.sub ? `<div class="subl">${esc(s.sub)}</div>` : ""}<p>${esc(s.text)}</p></div>`).join("")}</div>
   <div class="after"><div class="lbl">${esc(A.afterLabel)}</div>
     ${A.after.map((s) => `<div class="box"><h3>${esc(s.title)}</h3><p>${esc(s.text)}</p></div>`).join("")}
   </div>
@@ -308,6 +327,19 @@ $("#sections").innerHTML = parts.join("") + `
     };
     window.addEventListener("scroll", mark, { passive: true }); mark();
 
+    /* approach: sizing, then a step-by-step reveal */
+    const stepsEl = document.querySelector(".steps");
+    const stepEls = stepsEl ? [...stepsEl.querySelectorAll(".step")] : [];
+    const horiz = () => matchMedia("(min-width: 900px)").matches;
+    const sizeTrack = () => {
+      if (!stepEls.length) return;
+      const last = stepEls[stepEls.length - 1];
+      stepsEl.style.setProperty("--len", (horiz() ? last.offsetLeft : last.offsetTop) + "px");
+      const on = stepEls.filter((s) => s.classList.contains("on")).length;
+      if (on) stepsEl.style.setProperty("--fill", (horiz() ? stepEls[on - 1].offsetLeft : stepEls[on - 1].offsetTop) + "px");
+    };
+    sizeTrack(); window.addEventListener("resize", sizeTrack);
+
     if (matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) return;
 
     const fmt = (n, dec) => n.toLocaleString("en-US", { minimumFractionDigits: dec, maximumFractionDigits: dec });
@@ -329,7 +361,7 @@ $("#sections").innerHTML = parts.join("") + `
       requestAnimationFrame(tick);
     };
 
-    const targets = document.querySelectorAll(".section-head, section.block h2, section.block .intro, .card, .case, .mini, .job, .step, .ls, .final, .sk");
+    const targets = document.querySelectorAll(".section-head, section.block h2, section.block .intro, .card, .case, .mini, .job, .ls, .final, .sk");
     targets.forEach((el) => {
       const i = [...el.parentElement.children].indexOf(el);
       el.style.setProperty("--d", Math.min(i, 5) * 0.07 + "s");
@@ -342,6 +374,13 @@ $("#sections").innerHTML = parts.join("") + `
       el.querySelectorAll(".big, .ls b, .mini b").forEach(countUp);
     }), { threshold: 0.15, rootMargin: "0px 0px -40px 0px" });
     targets.forEach((el) => io.observe(el));
+
+    if (stepsEl) {
+      stepsEl.classList.add("seq"); sizeTrack();
+      const run = () => stepEls.forEach((s, i) => setTimeout(() => { s.classList.add("on"); sizeTrack(); }, 250 + i * 1000));
+      const so = new IntersectionObserver((es) => { if (es[0].isIntersecting) { so.disconnect(); run(); } }, { threshold: 0.3 });
+      so.observe(stepsEl);
+    }
 
     document.querySelectorAll(".hero .stat b").forEach((el) => countUp(el));
   } catch (err) { document.querySelectorAll(".rv").forEach((el) => el.classList.add("in")); }
