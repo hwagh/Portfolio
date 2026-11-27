@@ -205,8 +205,8 @@ $("#hero").innerHTML = `<div class="wrap">
 const parts = [];
 
 /* 03 how I can help */
-parts.push(section("help", "How I can help", "Where I can help your organization",
-  "Typical engagements, and the situation that usually calls for them.",
+parts.push(section("help", "How I can help", "Where leaders bring me in",
+  "Typical engagements, and the situation that usually triggers them.",
   `<div class="cards">${SITE.help.map((h) => `
     <article class="card"><h3>${esc(h.title)}</h3><p>${esc(h.text)}</p><div class="when"><b>You might need this if</b>${esc(h.when)}</div></article>`).join("")}</div>`, "alt"));
 
@@ -257,7 +257,7 @@ const jobHTML = (j) => {
     ${rest.length ? `<details><summary>Show ${rest.length} more</summary><ul>${rest.map((p) => `<li>${esc(p)}</li>`).join("")}</ul></details>` : ""}
   </div>`;
 };
-parts.push(section("experience", "Experience and education", "Where I have done this work", "Most recent first.",
+parts.push(section("experience", "Experience and education", "A track record across plants and programs", "Most recent first.",
   SITE.experience.map(jobHTML).join("") +
   `<div class="edu">${SITE.education.map((e) => `<div><b>${esc(e.title)}</b>${esc(e.org)}<br><span>${esc(e.dates)}</span></div>`).join("")}
     ${SITE.certifications.map((c) => `<div><b>${esc(c.title)}</b><span>${esc(c.dates)}</span></div>`).join("")}</div>`));
