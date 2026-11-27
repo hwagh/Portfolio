@@ -150,7 +150,7 @@ a:focus-visible,summary:focus-visible{outline:3px solid #7fb0ff;outline-offset:2
 <header class="head"><div class="wrap">
   <a class="brand" href="#top">Hrishikesh Wagh</a>
   <nav class="nav" aria-label="Sections">
-    <a href="#help">How I help</a><a href="#cases">Case studies</a><a href="#approach">Approach</a><a href="#leadership">Leadership</a><a href="#experience">Experience</a>
+    <a href="#help">How I help</a><a href="#cases">Case studies</a><a href="#reports">Reports</a><a href="#approach">Approach</a><a href="#leadership">Leadership</a><a href="#experience">Experience</a>
     <a class="btn sm" href="Hrishikesh_Wagh_Resume.pdf" download>Download resume</a>
     <a class="btn dark" href="#contact">Work with me</a>
   </nav>
@@ -225,6 +225,12 @@ parts.push(section("cases", "Case studies", "Problem. Fix. Result.",
   `<div class="sub">More results</div><div class="minis">${SITE.minis.map((m) => `
     <div class="mini"><b>${esc(m.b)}</b><em>${esc(m.t)}</em><span>${esc(m.w)}</span></div>`).join("")}</div>`, ));
 
+/* reports and dashboards */
+parts.push(section("reports", "Reports and dashboards", "Reports leaders use to run the plant",
+  SITE.reports.intro,
+  `<div class="cards">${SITE.reports.items.map((r) => `
+    <article class="card"><h3>${esc(r.title)}</h3><p>${esc(r.text)}</p><div class="when"><b>Evidence</b>${esc(r.proof)}</div></article>`).join("")}</div>`, "alt"));
+
 /* 02 approach */
 const A = SITE.approach;
 parts.push(section("approach", "End-to-end approach", "I don't just solve the problem. I make it stick.",
@@ -234,19 +240,19 @@ parts.push(section("approach", "End-to-end approach", "I don't just solve the pr
   <div class="after"><div class="lbl">${esc(A.afterLabel)}</div>
     ${A.after.map((s) => `<div class="box"><h3>${esc(s.title)}</h3><p>${esc(s.text)}</p></div>`).join("")}
   </div>
-  <div class="final"><h3>${esc(A.final.title)}</h3><p>${esc(A.final.text)}</p></div>`, "alt"));
+  <div class="final"><h3>${esc(A.final.title)}</h3><p>${esc(A.final.text)}</p></div>`));
 
 /* 04 leadership */
 const L = SITE.leadership;
 parts.push(section("leadership", "Leadership and coaching", "Teams built, people trained",
   SITE.philosophy.text,
   `<div class="lstats">${L.top.map((t) => `<div class="ls"><b>${esc(t.big)}</b><span>${esc(t.label)}</span></div>`).join("")}</div>
-  <div class="cards">${L.cards.map((c) => `<article class="card"><h3>${esc(c.title)}</h3><p>${esc(c.text)}</p>${tags(c.tags)}</article>`).join("")}</div>`));
+  <div class="cards">${L.cards.map((c) => `<article class="card"><h3>${esc(c.title)}</h3><p>${esc(c.text)}</p>${tags(c.tags)}</article>`).join("")}</div>`, "alt"));
 
 /* 05 skills */
 parts.push(section("skills", "Skillset", "Ten areas, one connected practice",
   "Process, business, systems, data, AI, people and leadership, used together rather than one at a time.",
-  `<div class="skills">${SITE.hub.nodes.map((n) => `<div class="sk"><b>${esc(n.name)}</b><span>${esc(n.skills.slice(0, 4).join(" · "))}</span></div>`).join("")}</div>`, "alt"));
+  `<div class="skills">${SITE.hub.nodes.map((n) => `<div class="sk"><b>${esc(n.name)}</b><span>${esc(n.skills.slice(0, 4).join(" · "))}</span></div>`).join("")}</div>`));
 
 /* 06 experience */
 const jobHTML = (j) => {
@@ -260,7 +266,7 @@ const jobHTML = (j) => {
 parts.push(section("experience", "Experience and education", "A track record across plants and programs", "Most recent first.",
   SITE.experience.map(jobHTML).join("") +
   `<div class="edu">${SITE.education.map((e) => `<div><b>${esc(e.title)}</b>${esc(e.org)}<br><span>${esc(e.dates)}</span></div>`).join("")}
-    ${SITE.certifications.map((c) => `<div><b>${esc(c.title)}</b><span>${esc(c.dates)}</span></div>`).join("")}</div>`));
+    ${SITE.certifications.map((c) => `<div><b>${esc(c.title)}</b><span>${esc(c.dates)}</span></div>`).join("")}</div>`, "alt"));
 
 $("#sections").innerHTML = parts.join("") + `
   <section class="contact" id="contact"><div class="wrap">
