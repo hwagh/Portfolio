@@ -150,7 +150,7 @@ a:focus-visible,summary:focus-visible{outline:3px solid #7fb0ff;outline-offset:2
 <header class="head"><div class="wrap">
   <a class="brand" href="#top">Hrishikesh Wagh</a>
   <nav class="nav" aria-label="Sections">
-    <a href="#cases">Case studies</a><a href="#approach">Approach</a><a href="#help">How I help</a><a href="#leadership">Leadership</a><a href="#experience">Experience</a>
+    <a href="#help">How I help</a><a href="#cases">Case studies</a><a href="#approach">Approach</a><a href="#leadership">Leadership</a><a href="#experience">Experience</a>
     <a class="btn sm" href="Hrishikesh_Wagh_Resume.pdf" download>Download resume</a>
     <a class="btn dark" href="#contact">Work with me</a>
   </nav>
@@ -204,6 +204,12 @@ $("#hero").innerHTML = `<div class="wrap">
 
 const parts = [];
 
+/* 03 how I can help */
+parts.push(section("help", "How I can help", "Where I can help your organization",
+  "Typical engagements, and the situation that usually calls for them.",
+  `<div class="cards">${SITE.help.map((h) => `
+    <article class="card"><h3>${esc(h.title)}</h3><p>${esc(h.text)}</p><div class="when"><b>You might need this if</b>${esc(h.when)}</div></article>`).join("")}</div>`, "alt"));
+
 /* 01 case studies */
 parts.push(section("cases", "Case studies", "Problem. Fix. Result.",
   "Three examples of how I take a plant problem to a number leadership can see.",
@@ -217,7 +223,7 @@ parts.push(section("cases", "Case studies", "Problem. Fix. Result.",
     </div>
   </article>`).join("") +
   `<div class="sub">More results</div><div class="minis">${SITE.minis.map((m) => `
-    <div class="mini"><b>${esc(m.b)}</b><em>${esc(m.t)}</em><span>${esc(m.w)}</span></div>`).join("")}</div>`, "alt"));
+    <div class="mini"><b>${esc(m.b)}</b><em>${esc(m.t)}</em><span>${esc(m.w)}</span></div>`).join("")}</div>`, ));
 
 /* 02 approach */
 const A = SITE.approach;
@@ -228,13 +234,7 @@ parts.push(section("approach", "End-to-end approach", "I don't just solve the pr
   <div class="after"><div class="lbl">${esc(A.afterLabel)}</div>
     ${A.after.map((s) => `<div class="box"><h3>${esc(s.title)}</h3><p>${esc(s.text)}</p></div>`).join("")}
   </div>
-  <div class="final"><h3>${esc(A.final.title)}</h3><p>${esc(A.final.text)}</p></div>`));
-
-/* 03 how I can help */
-parts.push(section("help", "How I can help", "Where I can help your organization",
-  "Typical engagements, and the situation that usually calls for them.",
-  `<div class="cards">${SITE.help.map((h) => `
-    <article class="card"><h3>${esc(h.title)}</h3><p>${esc(h.text)}</p><div class="when"><b>You might need this if</b>${esc(h.when)}</div></article>`).join("")}</div>`, "alt"));
+  <div class="final"><h3>${esc(A.final.title)}</h3><p>${esc(A.final.text)}</p></div>`, "alt"));
 
 /* 04 leadership */
 const L = SITE.leadership;
