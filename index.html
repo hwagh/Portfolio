@@ -177,6 +177,12 @@ a:focus-visible,summary:focus-visible{outline:3px solid #7fb0ff;outline-offset:2
 }
 @media print{.steps.seq .step{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.fill,.step,.dot{transition:none!important}}
+.steps.scroll .fill{transition:none}
+.steps.scroll .step{transition:opacity .35s ease,transform .35s ease}
+.steps.scroll .step .dot{transition-delay:0s}
+#approach.pin{box-sizing:border-box}
+#approach.pin .wrap{position:sticky;top:var(--st,70px)}
+@media print{#approach.pin{height:auto!important}#approach.pin .wrap{position:static}}
 </style>
 </head>
 <body>
@@ -327,16 +333,18 @@ $("#sections").innerHTML = parts.join("") + `
     };
     window.addEventListener("scroll", mark, { passive: true }); mark();
 
-    /* approach: sizing, then a step-by-step reveal */
+    /* approach: sizing the timeline track */
     const stepsEl = document.querySelector(".steps");
     const stepEls = stepsEl ? [...stepsEl.querySelectorAll(".step")] : [];
     const horiz = () => matchMedia("(min-width: 900px)").matches;
+    const pos = (s) => (horiz() ? s.offsetLeft : s.offsetTop);
     const sizeTrack = () => {
       if (!stepEls.length) return;
-      const last = stepEls[stepEls.length - 1];
-      stepsEl.style.setProperty("--len", (horiz() ? last.offsetLeft : last.offsetTop) + "px");
-      const on = stepEls.filter((s) => s.classList.contains("on")).length;
-      if (on) stepsEl.style.setProperty("--fill", (horiz() ? stepEls[on - 1].offsetLeft : stepEls[on - 1].offsetTop) + "px");
+      stepsEl.style.setProperty("--len", pos(stepEls[stepEls.length - 1]) + "px");
+      if (!stepsEl.classList.contains("scroll")) {
+        const on = stepEls.filter((s) => s.classList.contains("on")).length;
+        if (on) stepsEl.style.setProperty("--fill", pos(stepEls[on - 1]) + "px");
+      }
     };
     sizeTrack(); window.addEventListener("resize", sizeTrack);
 
@@ -376,9 +384,58 @@ $("#sections").innerHTML = parts.join("") + `
     targets.forEach((el) => io.observe(el));
 
     if (stepsEl) {
-      stepsEl.classList.add("seq"); sizeTrack();
-      const run = () => stepEls.forEach((s, i) => setTimeout(() => { s.classList.add("on"); sizeTrack(); }, 250 + i * 1000));
-      const so = new IntersectionObserver((es) => { if (es[0].isIntersecting) { so.disconnect(); run(); } }, { threshold: 0.3 });
+      /* approach: steps appear as the visitor scrolls (pinned on wide screens, along the page on narrow ones) */
+      const sec = document.getElementById("approach"), wrap = sec.querySelector(".wrap");
+      const head = document.querySelector(".head"), N = stepEls.length;
+      let mode = "", extra = 0, stickTop = 0, padTop = 0, ran = false;
+      stepsEl.classList.add("seq");
+      const apply = (u, started) => {
+        stepEls.forEach((s, i) => s.classList.toggle("on", started && u >= i - 1e-6));
+        const i0 = Math.min(N - 2, Math.floor(u)), f = u - i0;
+        const px = started ? pos(stepEls[i0]) + f * (pos(stepEls[i0 + 1]) - pos(stepEls[i0])) : 0;
+        stepsEl.style.setProperty("--fill", px + "px");
+      };
+      const update = () => {
+        if (mode === "pin") {
+          const top = sec.getBoundingClientRect().top + padTop;
+          const p = Math.min(1, Math.max(0, (stickTop - top) / extra));
+          apply(Math.min(1, p / 0.85) * (N - 1), top < innerHeight * 0.75);
+        } else if (mode === "vert") {
+          const y = innerHeight * 0.65 - stepsEl.getBoundingClientRect().top;
+          let u = 0;
+          for (let i = 0; i < N - 1; i++) {
+            const a = pos(stepEls[i]), b = pos(stepEls[i + 1]);
+            if (y >= b) u = i + 1; else if (y > a) { u = i + (y - a) / (b - a); break; } else break;
+          }
+          apply(u, y >= 0);
+        }
+      };
+      const setup = () => {
+        sec.classList.remove("pin"); sec.style.height = "";
+        const headH = head ? head.offsetHeight : 0;
+        if (horiz() && wrap.offsetHeight + headH + 24 <= innerHeight) {
+          mode = "pin"; stepsEl.classList.add("scroll");
+          padTop = parseFloat(getComputedStyle(sec).paddingTop) || 0;
+          stickTop = headH + 12; extra = Math.round(innerHeight * 0.3 * N);
+          sec.style.setProperty("--st", stickTop + "px");
+          sec.style.height = sec.offsetHeight + extra + "px";
+          sec.classList.add("pin");
+        } else if (!horiz()) {
+          mode = "vert"; stepsEl.classList.add("scroll");
+        } else {
+          mode = "timed"; stepsEl.classList.remove("scroll");
+        }
+        sizeTrack(); update();
+      };
+      setup();
+      let raf = 0;
+      window.addEventListener("scroll", () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; update(); }); }, { passive: true });
+      window.addEventListener("resize", () => { clearTimeout(setup.t); setup.t = setTimeout(setup, 150); });
+      const so = new IntersectionObserver((es) => {
+        if (!es[0].isIntersecting || mode !== "timed" || ran) return;
+        ran = true; so.disconnect();
+        stepEls.forEach((s, i) => setTimeout(() => { s.classList.add("on"); sizeTrack(); }, 250 + i * 1000));
+      }, { threshold: 0.3 });
       so.observe(stepsEl);
     }
 
