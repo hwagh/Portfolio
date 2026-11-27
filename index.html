@@ -32,6 +32,8 @@ a{color:var(--accent)}
 .btn:hover{background:var(--surface)}
 .btn.dark{background:var(--ink);border-color:var(--ink);color:#fff;padding:9px 18px;font-size:14px}
 .btn.dark:hover{background:var(--accent);border-color:var(--accent)}
+.btn.sm{padding:9px 18px;font-size:14px}
+.nav a.btn.sm{color:var(--ink)}
 /* hero */
 .hero{padding:72px 0 64px}
 .hero .wrap{display:flex;flex-wrap:wrap;gap:48px;align-items:center}
@@ -149,6 +151,7 @@ a:focus-visible,summary:focus-visible{outline:3px solid #7fb0ff;outline-offset:2
   <a class="brand" href="#top">Hrishikesh Wagh</a>
   <nav class="nav" aria-label="Sections">
     <a href="#cases">Case studies</a><a href="#approach">Approach</a><a href="#help">How I help</a><a href="#leadership">Leadership</a><a href="#experience">Experience</a>
+    <a class="btn sm" href="Hrishikesh_Wagh_Resume.pdf" download>Download resume</a>
     <a class="btn dark" href="#contact">Work with me</a>
   </nav>
 </div></header>
@@ -268,6 +271,7 @@ $("#sections").innerHTML = parts.join("") + `
       <a class="btn primary" href="mailto:${esc(SITE.email)}?subject=Opportunity%20or%20project">Email me</a>
       <a class="btn" href="tel:${tel}">${esc(SITE.phone)}</a>
       <a class="btn" href="${esc(SITE.linkedin)}" rel="noopener">LinkedIn</a>
+      <a class="btn" href="Hrishikesh_Wagh_Resume.pdf" download>Download resume</a>
     </div>
     <div class="note">${esc(SITE.workStyle)}</div>
   </div></section>
